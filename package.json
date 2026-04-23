@@ -16,7 +16,8 @@
     "build-cache": "tsx src/scripts/buildCache.ts",
     "play": "tsx src/index.ts",
     "benchmark": "tsx src/scripts/benchmark.ts",
-    "analyze": "tsx src/scripts/analyze.ts"
+    "analyze": "tsx src/scripts/analyze.ts",
+    "league": "tsx src/scripts/league.ts"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",

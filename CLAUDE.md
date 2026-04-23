@@ -62,6 +62,9 @@ npm run benchmark      # plays all 2,315; expects avg < 3.50
                        #   --quiet
 npm run analyze        # send logs/ to Claude for strategic-pattern report
                        # requires ANTHROPIC_API_KEY; default model is opus-4-7
+npm run league         # entropy / oneply / frequency / minimax head-to-head
+                       #   --sample N            quicker run on first N
+                       #   --skip oneply,minimax exclude slow scorers
 ```
 
 Slash commands wrap the same scripts: `/feedback-check`, `/build-cache`, `/play`, `/benchmark`, `/fetch-wordlists`.

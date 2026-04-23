@@ -63,11 +63,19 @@ test/
 
 ## Scorers
 
-`npm run benchmark -- --scorer entropy|oneply`
+`npm run benchmark -- --scorer entropy|oneply|frequency|minimax`
 
-| scorer  | avg   | max | win   | distribution                                         | wall |
-|---------|-------|-----|-------|-----------------------------------------------------|------|
-| entropy | 3.434 | 6   | 100%  | { 2: 79, 3: 1224, 4: 945, 5: 63, 6: 4 }             | 33s  |
-| oneply  | 3.472 | 6   | 100%  | { 2: 90, 3: 1159, 4: 951, 5: 114, 6: 1 }            | 249s |
+`npm run league` runs all four head-to-head over the same answer set. Full 2,315-answer numbers:
 
-Entropy wins on average. One-ply lookahead with a simple expected-guesses heuristic gets a different shape (more 2-turn wins, fewer 6-turn games, more 5-turn games) but doesn't beat entropy. Closing the gap to the DP-optimal 3.42 needs full DP — the spec's "~10x slower" estimate for one-ply understates the lift.
+| scorer    | avg   | max | win    | fail | 2  | 3    | 4    | 5   | 6  | wall |
+|-----------|-------|-----|--------|------|----|------|------|-----|----|------|
+| entropy   | 3.434 | 6   | 100%   | 0    | 79 | 1224 | 945  | 63  | 4  | 33s  |
+| oneply    | 3.472 | 6   | 100%   | 0    | 90 | 1159 | 951  | 114 | 1  | 247s |
+| minimax   | 3.621 | 6   | 100%   | 0    | 56 | 910  | 1215 | 123 | 11 | 27s  |
+| frequency | 3.721 | 6   | 99.0%  | 22   | 94 | 871  | 977  | 278 | 72 | 10s  |
+
+Findings:
+- Entropy is the winner. Spec §1's predictions of ~3.43 / ~3.5 / ~3.7 for entropy / minimax / frequency are accurate to two decimals.
+- One-ply with a simple expected-guesses heuristic doesn't beat plain entropy — closing the gap to DP-optimal 3.42 needs full DP.
+- Frequency is the only scorer that *fails* (22 / 2315) — fast and cheap, but ignores positional information so it occasionally runs out of turns.
+- Minimax solves every game but ends up 0.2 worse than entropy on avg — minimizing the worst case sacrifices the easy splits.

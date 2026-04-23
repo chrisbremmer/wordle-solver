@@ -3,6 +3,8 @@
 
 import { loadOrBuildCache } from '../cacheLoader.js';
 import { ANSWERS } from '../data/answers.js';
+import { pickBestGuessFrequency } from '../core/frequencyScorer.js';
+import { pickBestGuessMinimax } from '../core/minimaxScorer.js';
 import { pickBestGuessOnePly } from '../core/oneplyScorer.js';
 import { pickBestGuess, type ScorerStrategy } from '../core/scorer.js';
 import { runBenchmark } from './benchmarkLib.js';
@@ -18,8 +20,10 @@ const scorerName = scorerIdx >= 0 ? args[scorerIdx + 1] : 'entropy';
 let scorer: ScorerStrategy;
 if (scorerName === 'oneply') scorer = pickBestGuessOnePly;
 else if (scorerName === 'entropy') scorer = pickBestGuess;
+else if (scorerName === 'frequency') scorer = pickBestGuessFrequency;
+else if (scorerName === 'minimax') scorer = pickBestGuessMinimax;
 else {
-  console.error(`unknown --scorer "${scorerName}" (entropy | oneply)`);
+  console.error(`unknown --scorer "${scorerName}" (entropy | oneply | frequency | minimax)`);
   process.exit(2);
 }
 
