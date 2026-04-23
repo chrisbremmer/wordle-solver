@@ -1,10 +1,16 @@
 ---
 description: Launch the interactive Wordle solver CLI
-allowed-tools: Bash(npm run play)
+argument-hint: "[--hard]"
+allowed-tools: Bash(npm run play:*)
 ---
 
-Launch the interactive solver:
+Launch the interactive solver. The CLI suggests a guess each turn and accepts feedback as:
+- **Emoji** (paste from Wordle share modal): `🟩🟨⬛⬛🟩`
+- **Letters**: `gy..g`  (G=green, Y=yellow, .=grey)
+- **Digits**: `21002`  (2=green, 1=yellow, 0=grey)
 
-!`npm run play`
+If the user passes `--hard` in `$ARGUMENTS`, add it to the command to enforce Wordle Hard Mode (every guess must satisfy all learned greens / yellows).
 
-The CLI will print a guess each turn and prompt for feedback as `gy..g` (or `21002`). Enter `ggggg` when solved.
+!`npm run play -- $ARGUMENTS`
+
+After each game prints a Discord-ready share block and asks `Play another? (y/N)`.

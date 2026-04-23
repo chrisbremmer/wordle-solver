@@ -2,7 +2,7 @@
 
 A TypeScript Wordle solver. Targets ~3.43 average guesses using entropy scoring with a precomputed pattern cache. Runs locally as a CLI, designed for the "Wordle on phone, solver on laptop" workflow.
 
-**Status:** spec-complete (see [`docs/engineering-spec.md`](docs/engineering-spec.md)). 68 unit tests + a full 2,315-answer integration benchmark passing. Hits 3.434 avg / 100% win rate — within 0.01 of the DP-optimal 3.42 bound.
+**Status:** spec-complete (see [`docs/engineering-spec.md`](docs/engineering-spec.md)). 75 unit tests + a full 2,315-answer integration benchmark passing. Hits 3.434 avg / 100% win rate — within 0.01 of the DP-optimal 3.42 bound. Hard Mode supported via `--hard`.
 
 ---
 
@@ -194,6 +194,7 @@ test/
   scorer.test.ts          entropy + heuristics
   oneplyScorer.test.ts
   leagueScorers.test.ts   frequency + minimax
+  hardMode.test.ts        guessPool + scorers respect hard mode
   patternCache.test.ts    build / serialize / deserialize
   controller.test.ts      synthetic-cache full-game smoke
   share.test.ts           share block formatter
@@ -224,7 +225,7 @@ CLAUDE.md                 per-session context if you use Claude Code on this rep
 
 ```bash
 npm run typecheck   # TypeScript strict-mode check
-npm test            # 68 unit + 1 full-set integration (~95s, asserts spec §10)
+npm test            # 75 unit + 1 full-set integration (~95s, asserts spec §10)
 ```
 
 Spec §10 targets: avg < 3.50, max ≤ 6, 100% win rate. The integration test actually plays all 2,315 answers and asserts these hold.

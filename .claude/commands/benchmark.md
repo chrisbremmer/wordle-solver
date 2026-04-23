@@ -1,10 +1,16 @@
 ---
-description: Plays all 2,309 answers and reports avg / max / distribution
-argument-hint: "[--full | --sample N]"
+description: Plays all 2,315 answers and reports avg / max / distribution
+argument-hint: "[--sample N] [--hard] [--scorer entropy|oneply|frequency|minimax]"
 ---
 
-Delegate to the `benchmark-runner` agent to run the full integration benchmark and produce the structured report.
+Delegate to the `benchmark-runner` agent to run the integration benchmark and produce the structured report.
 
-If `$ARGUMENTS` includes `--sample N`, ask the agent to play a random sample of N answers instead of the full set (useful for quick iteration during development). Otherwise run the full 2,309-answer benchmark.
+Argument handling:
+- `--sample N` — play only the first N answers (quick iteration).
+- `--hard` — enforce Hard Mode (every guess must satisfy known greens / yellows / counts).
+- `--scorer X` — use `entropy` (default), `oneply`, `frequency`, or `minimax`.
+- Multiple flags combine: e.g. `--sample 100 --hard --scorer minimax`.
 
-Targets: avg < 3.50, max ≤ 6, win rate 100% (spec §10).
+Pass `$ARGUMENTS` straight through to the agent.
+
+Targets (spec §10, normal mode): avg < 3.50, max ≤ 6, win rate 100%. Hard Mode relaxes these — expect ~3.52 avg / ~99.8% win / 5 fails on the full set.

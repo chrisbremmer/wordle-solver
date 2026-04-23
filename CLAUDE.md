@@ -75,7 +75,7 @@ npm run league         # entropy / oneply / frequency / minimax head-to-head
                        #   --skip oneply,minimax exclude slow scorers
 ```
 
-Slash commands wrap the same scripts: `/feedback-check`, `/build-cache`, `/play`, `/benchmark`, `/fetch-wordlists`.
+Slash commands wrap the same scripts: `/feedback-check`, `/build-cache`, `/play`, `/benchmark`, `/league`, `/analyze`, `/fetch-wordlists`.
 
 ## Conventions
 
