@@ -3,12 +3,24 @@
 
 import { loadOrBuildCache } from '../cacheLoader.js';
 import { ANSWERS } from '../data/answers.js';
+import { pickBestGuessOnePly } from '../core/oneplyScorer.js';
+import { pickBestGuess, type ScorerStrategy } from '../core/scorer.js';
 import { runBenchmark } from './benchmarkLib.js';
 
 const args = process.argv.slice(2);
 const quiet = args.includes('--quiet');
 const sampleIdx = args.indexOf('--sample');
 const sampleN = sampleIdx >= 0 ? Number(args[sampleIdx + 1]) : 0;
+const scorerIdx = args.indexOf('--scorer');
+const scorerName = scorerIdx >= 0 ? args[scorerIdx + 1] : 'entropy';
+
+let scorer: ScorerStrategy;
+if (scorerName === 'oneply') scorer = pickBestGuessOnePly;
+else if (scorerName === 'entropy') scorer = pickBestGuess;
+else {
+  console.error(`unknown --scorer "${scorerName}" (entropy | oneply)`);
+  process.exit(2);
+}
 
 const { cache } = loadOrBuildCache(!quiet);
 
@@ -21,8 +33,9 @@ if (sampleN > 0) {
 
 const t0 = Date.now();
 const report = await runBenchmark(cache, answers, ANSWERS, {
+  scorer,
   onProgress: quiet ? undefined : (done, total) => {
-    if (done % 200 === 0 || done === total) {
+    if (done % 50 === 0 || done === total) {
       process.stderr.write(`\r  ${done}/${total}`);
     }
   },
@@ -37,6 +50,7 @@ const dist = Object.entries(report.distribution)
 
 console.log('Benchmark report');
 console.log('----------------');
+console.log(`Scorer:       ${scorerName}`);
 console.log(`Games:        ${report.total}`);
 console.log(`Avg guesses:  ${report.avgGuesses.toFixed(3)}    [target < 3.50]`);
 console.log(`Max guesses:  ${report.maxGuesses}             [target ≤ 6]`);

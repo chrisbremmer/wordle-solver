@@ -6,6 +6,9 @@ import type { GameState } from './state.js';
 
 export const HARDCODED_OPENER = 'salet';
 
+/** A scorer strategy: picks the next guess given current state + cache. */
+export type ScorerStrategy = (state: GameState, cache: PatternCache) => string;
+
 const LOG2 = Math.log(2);
 
 /**

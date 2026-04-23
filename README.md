@@ -44,3 +44,14 @@ test/
 - Avg guesses: < 3.50 (target ~3.43)
 - Max guesses: ≤ 6 (no losses)
 - Win rate: 100%
+
+## Scorers
+
+`npm run benchmark -- --scorer entropy|oneply`
+
+| scorer  | avg   | max | win   | distribution                                         | wall |
+|---------|-------|-----|-------|-----------------------------------------------------|------|
+| entropy | 3.434 | 6   | 100%  | { 2: 79, 3: 1224, 4: 945, 5: 63, 6: 4 }             | 33s  |
+| oneply  | 3.472 | 6   | 100%  | { 2: 90, 3: 1159, 4: 951, 5: 114, 6: 1 }            | 249s |
+
+Entropy wins on average. One-ply lookahead with a simple expected-guesses heuristic gets a different shape (more 2-turn wins, fewer 6-turn games, more 5-turn games) but doesn't beat entropy. Closing the gap to the DP-optimal 3.42 needs full DP — the spec's "~10x slower" estimate for one-ply understates the lift.

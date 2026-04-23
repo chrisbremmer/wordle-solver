@@ -2,7 +2,7 @@
 
 import { isCandidate } from './core/filter.js';
 import type { PatternCache } from './core/patternCache.js';
-import { pickBestGuess } from './core/scorer.js';
+import { pickBestGuess, type ScorerStrategy } from './core/scorer.js';
 import { GameState, normalizeFeedback } from './core/state.js';
 
 export const MAX_TURNS = 6;
@@ -28,6 +28,7 @@ export class GameController {
   constructor(
     private readonly cache: PatternCache,
     private readonly answers: readonly string[],
+    private readonly scorer: ScorerStrategy = pickBestGuess,
   ) {}
 
   async play(getFeedback: FeedbackSource): Promise<GameOutcome> {
@@ -35,7 +36,7 @@ export class GameController {
     const trace: TurnTrace[] = [];
 
     while (state.turn <= MAX_TURNS) {
-      const guess = pickBestGuess(state, this.cache);
+      const guess = this.scorer(state, this.cache);
       const raw = await getFeedback(guess, state.turn);
       const fb = normalizeFeedback(raw);
 

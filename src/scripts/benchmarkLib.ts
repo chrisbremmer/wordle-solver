@@ -4,6 +4,7 @@
 import { GameController } from '../controller.js';
 import { getPattern } from '../core/feedback.js';
 import type { PatternCache } from '../core/patternCache.js';
+import type { ScorerStrategy } from '../core/scorer.js';
 
 export interface BenchmarkReport {
   total: number;
@@ -17,6 +18,7 @@ export interface BenchmarkReport {
 
 export interface RunOptions {
   onProgress?: (done: number, total: number) => void;
+  scorer?: ScorerStrategy;
 }
 
 function patternToFeedback(p: number): string {
@@ -34,7 +36,7 @@ export async function runBenchmark(
   candidatePool: readonly string[],
   opts: RunOptions = {},
 ): Promise<BenchmarkReport> {
-  const controller = new GameController(cache, candidatePool);
+  const controller = new GameController(cache, candidatePool, opts.scorer);
   const dist: Record<string, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, FAIL: 0 };
   const hard: BenchmarkReport['hardGames'] = [];
   let wins = 0;
