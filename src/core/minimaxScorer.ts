@@ -7,6 +7,7 @@
 // optimizing the worst case sacrifices average performance on the easy splits.
 
 import { ALL_GREEN, NUM_PATTERNS } from './feedback.js';
+import { guessPool } from './filter.js';
 import type { PatternCache } from './patternCache.js';
 import { pickBestGuess } from './scorer.js';
 import type { GameState } from './state.js';
@@ -44,16 +45,18 @@ export function pickBestGuessMinimax(state: GameState, cache: PatternCache): str
     remainingIdx[i] = idx;
   }
 
+  const pool = guessPool(state, cache);
   const candSet = new Set(remaining);
-  let bestGuess = cache.guesses[0]!;
+  let bestGuess = pool[0]!;
   let bestMax = Infinity;
   let bestIsCand = candSet.has(bestGuess);
 
-  for (let g = 0; g < cache.guesses.length; g++) {
-    const { maxSize, allGreenSeen } = maxBucketSize(g, remainingIdx, cache);
+  for (const guess of pool) {
+    const gIdx = cache.guessIndex.get(guess)!;
+    const { maxSize, allGreenSeen } = maxBucketSize(gIdx, remainingIdx, cache);
     // Tiebreak: prefer guesses that are themselves candidates (the all-green
     // bucket is the win condition, smaller worst case if guess IS the answer).
-    const isCand = candSet.has(cache.guesses[g]!);
+    const isCand = candSet.has(guess);
     const tied = maxSize === bestMax;
     if (
       maxSize < bestMax ||
@@ -61,7 +64,7 @@ export function pickBestGuessMinimax(state: GameState, cache: PatternCache): str
       (tied && allGreenSeen && isCand && !bestIsCand)
     ) {
       bestMax = maxSize;
-      bestGuess = cache.guesses[g]!;
+      bestGuess = guess;
       bestIsCand = isCand;
     }
   }

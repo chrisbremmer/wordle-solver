@@ -19,6 +19,8 @@ export interface GameLog {
   guesses: number;
   /** Known when source is benchmark, or when interactive game was solved. */
   answer?: string;
+  /** True if the session enforced Wordle Hard Mode constraints. */
+  hardMode?: boolean;
   trace: GameOutcome['trace'];
 }
 

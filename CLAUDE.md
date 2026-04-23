@@ -61,10 +61,12 @@ npm run typecheck      # tsc --noEmit
 npm run test:feedback  # just the dup-letter cases
 npm run build-cache    # writes cache.bin (~34MB, ~20s, one-time)
 npm run play           # interactive CLI (writes logs/<ts>-<answer>.json)
+                       #   --hard    enforce Wordle Hard Mode
 npm run benchmark      # plays all 2,315; expects avg < 3.50
                        #   --scorer entropy|oneply|frequency|minimax
                        #   --sample N
                        #   --log     write logs/ for every game
+                       #   --hard    hard-mode benchmark (~99.8% win)
                        #   --quiet
 npm run analyze        # send logs/ to Claude for strategic-pattern report
                        # requires ANTHROPIC_API_KEY; default model is opus-4-7

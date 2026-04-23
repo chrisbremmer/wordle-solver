@@ -29,10 +29,11 @@ export class GameController {
     private readonly cache: PatternCache,
     private readonly answers: readonly string[],
     private readonly scorer: ScorerStrategy = pickBestGuess,
+    private readonly hardMode: boolean = false,
   ) {}
 
   async play(getFeedback: FeedbackSource): Promise<GameOutcome> {
-    const state = new GameState(this.answers);
+    const state = new GameState(this.answers, { hardMode: this.hardMode });
     const trace: TurnTrace[] = [];
 
     while (state.turn <= MAX_TURNS) {

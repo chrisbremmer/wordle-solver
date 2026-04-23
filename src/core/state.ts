@@ -50,9 +50,15 @@ export class GameState {
   maxCounts: Map<string, number> = new Map();
   turn = 1;
   candidates: string[];
+  /**
+   * Hard Mode: every subsequent guess must satisfy all learned greens /
+   * yellows / counts — i.e. isCandidate(guess, state). Off by default.
+   */
+  hardMode: boolean;
 
-  constructor(initialCandidates: readonly string[]) {
+  constructor(initialCandidates: readonly string[], opts: { hardMode?: boolean } = {}) {
     this.candidates = [...initialCandidates];
+    this.hardMode = opts.hardMode ?? false;
   }
 
   /**

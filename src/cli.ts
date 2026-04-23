@@ -41,7 +41,7 @@ function reportOutcome(outcome: GameOutcome): void {
   console.log(`\n${formatShare(outcome)}`);
 }
 
-function persistLog(outcome: GameOutcome): void {
+function persistLog(outcome: GameOutcome, hardMode: boolean): void {
   const last = outcome.trace.at(-1);
   const answer = outcome.solved && last ? last.guess : undefined;
   writeLog({
@@ -52,26 +52,28 @@ function persistLog(outcome: GameOutcome): void {
     outcome: outcome.solved ? 'solved' : 'failed',
     guesses: outcome.guesses,
     answer,
+    hardMode,
     trace: outcome.trace,
   });
 }
 
 export async function playInteractive(): Promise<void> {
+  const hardMode = process.argv.includes('--hard');
   const { cache, source, ms } = loadOrBuildCache();
-  console.error(`cache: ${source} (${ms}ms)`);
+  console.error(`cache: ${source} (${ms}ms)${hardMode ? '  [HARD MODE]' : ''}`);
   console.error(
     'feedback: G/Y/.  or  2/1/0  or  🟩/🟨/⬛  (e.g. "gy..g" or "🟩🟨⬛⬛🟩")',
   );
 
   const rl = createInterface({ input: stdin, output: stdout });
-  const controller = new GameController(cache, ANSWERS);
+  const controller = new GameController(cache, ANSWERS, undefined, hardMode);
 
   try {
     while (true) {
       console.log(); // blank line between games
       const outcome = await playOne(controller, rl);
       reportOutcome(outcome);
-      persistLog(outcome);
+      persistLog(outcome, hardMode);
 
       const again = (await rl.question('\nPlay another? (y/N) ')).trim().toLowerCase();
       if (again !== 'y' && again !== 'yes') break;

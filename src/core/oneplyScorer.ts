@@ -35,6 +35,7 @@
 //     candidates (late game, lookahead can't help).
 
 import { ALL_GREEN, NUM_PATTERNS } from './feedback.js';
+import { guessPool } from './filter.js';
 import type { PatternCache } from './patternCache.js';
 import { entropyForGuess, HARDCODED_OPENER, pickBestGuess } from './scorer.js';
 import type { GameState } from './state.js';
@@ -79,11 +80,14 @@ export function pickBestGuessOnePly(
   const N = remainingIdx.length;
   const candSet = new Set(remaining);
 
-  // First-ply entropy across the full guess pool — used both to pick
-  // top-K and to seed the second-ply pool.
-  const firstPly: Array<{ gIdx: number; h: number }> = new Array(cache.guesses.length);
-  for (let g = 0; g < cache.guesses.length; g++) {
-    firstPly[g] = { gIdx: g, h: entropyForGuess(g, remainingIdx, cache) };
+  // First-ply entropy over the allowed pool (normal = full guesses, hard
+  // mode = constraint-respecting). The second-ply pool is picked from this
+  // same ranking below, so it inherits the hard-mode restriction naturally.
+  const pool = guessPool(state, cache);
+  const firstPly: Array<{ gIdx: number; h: number }> = new Array(pool.length);
+  for (let i = 0; i < pool.length; i++) {
+    const gIdx = cache.guessIndex.get(pool[i]!)!;
+    firstPly[i] = { gIdx, h: entropyForGuess(gIdx, remainingIdx, cache) };
   }
   firstPly.sort((a, b) => b.h - a.h);
 

@@ -12,6 +12,7 @@ import { runBenchmark } from './benchmarkLib.js';
 const args = process.argv.slice(2);
 const quiet = args.includes('--quiet');
 const logGames = args.includes('--log');
+const hardMode = args.includes('--hard');
 const sampleIdx = args.indexOf('--sample');
 const sampleN = sampleIdx >= 0 ? Number(args[sampleIdx + 1]) : 0;
 const scorerIdx = args.indexOf('--scorer');
@@ -41,6 +42,7 @@ const report = await runBenchmark(cache, answers, ANSWERS, {
   scorer,
   logGames,
   scorerName,
+  hardMode,
   onProgress: quiet ? undefined : (done, total) => {
     if (done % 50 === 0 || done === total) {
       process.stderr.write(`\r  ${done}/${total}`);
@@ -57,7 +59,7 @@ const dist = Object.entries(report.distribution)
 
 console.log('Benchmark report');
 console.log('----------------');
-console.log(`Scorer:       ${scorerName}`);
+console.log(`Scorer:       ${scorerName}${hardMode ? ' (hard)' : ''}`);
 console.log(`Games:        ${report.total}`);
 console.log(`Avg guesses:  ${report.avgGuesses.toFixed(3)}    [target < 3.50]`);
 console.log(`Max guesses:  ${report.maxGuesses}             [target ≤ 6]`);

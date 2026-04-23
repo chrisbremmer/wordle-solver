@@ -24,6 +24,8 @@ export interface RunOptions {
   logGames?: boolean;
   /** Used in the persisted log; defaults to 'entropy'. */
   scorerName?: string;
+  /** Hard mode: each guess must satisfy all learned constraints. */
+  hardMode?: boolean;
 }
 
 function patternToFeedback(p: number): string {
@@ -41,7 +43,7 @@ export async function runBenchmark(
   candidatePool: readonly string[],
   opts: RunOptions = {},
 ): Promise<BenchmarkReport> {
-  const controller = new GameController(cache, candidatePool, opts.scorer);
+  const controller = new GameController(cache, candidatePool, opts.scorer, opts.hardMode ?? false);
   const dist: Record<string, number> = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0, 6: 0, FAIL: 0 };
   const hard: BenchmarkReport['hardGames'] = [];
   let wins = 0;
@@ -72,6 +74,7 @@ export async function runBenchmark(
         outcome: outcome.solved ? 'solved' : 'failed',
         guesses: outcome.guesses,
         answer,
+        hardMode: opts.hardMode ?? false,
         trace: outcome.trace,
       });
     }

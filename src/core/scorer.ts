@@ -1,6 +1,7 @@
 // Entropy scorer — see spec §8.
 
 import { NUM_PATTERNS } from './feedback.js';
+import { guessPool } from './filter.js';
 import type { PatternCache } from './patternCache.js';
 import type { GameState } from './state.js';
 
@@ -65,7 +66,7 @@ export function pickBestGuess(state: GameState, cache: PatternCache): string {
   }
 
   const preferCandidate = state.turn >= 5 || remaining.length <= 3;
-  const pool = preferCandidate ? remaining : cache.guesses;
+  const pool = preferCandidate ? remaining : guessPool(state, cache);
   const candidateSet = preferCandidate ? null : new Set(remaining);
 
   let bestGuess = pool[0]!;

@@ -95,6 +95,10 @@ npm run benchmark -- --sample 100
 # Try a different scorer
 npm run benchmark -- --scorer minimax
 
+# Hard Mode (every guess must satisfy known greens + yellows)
+npm run play -- --hard
+npm run benchmark -- --hard
+
 # Persist one log file per benchmark game (for analyze)
 npm run benchmark -- --sample 20 --log
 
@@ -138,6 +142,21 @@ Full 2,315-answer league results:
 | frequency | 3.721 | 6   | 99.0%  | 22   | 94 | 871  | 977  | 278 | 72 | 10s  |
 
 Spec §1's predictions of ~3.43 / ~3.5 / ~3.7 for entropy / minimax / frequency are accurate to two decimals. One-ply lookahead with a simple expected-guesses heuristic doesn't beat plain entropy — closing the gap to DP-optimal 3.42 needs full DP.
+
+### Hard Mode
+
+Hard Mode makes every guess have to satisfy all known greens / yellows / counts — you can't do pure-information probes once constraints accumulate. Enable with `--hard` on `play` or `benchmark`. Spec §12 excluded hard mode from the original design; implementation adds ~50 lines (each scorer filters its pool through `isCandidate`).
+
+Entropy scorer on the full 2,315-answer set:
+
+| mode    | avg   | max | win     | fail | 2   | 3    | 4   | 5   | 6  | wall |
+|---------|-------|-----|---------|------|-----|------|-----|-----|----|------|
+| normal  | 3.434 | 6   | 100%    | 0    | 79  | 1224 | 945 | 63  | 4  | 34s  |
+| hard    | 3.516 | 6   | 99.78%  | 5    | 121 | 1064 | 962 | 139 | 24 | 5s   |
+
+Hard mode costs ~0.08 avg and produces 5 outright failures (0.22%) where greedy entropy gets boxed into a locked-letter wall — e.g. greens lock into `_OUND` with BOUND / FOUND / HOUND / MOUND / ROUND / SOUND / WOUND all possible and no way to discriminate without burning turns. DP-optimal hard-mode solvers exist but need proper tree search; greedy hits this wall occasionally.
+
+Hard mode is actually **faster** than normal (5s vs 34s) because the filtered pool is a fraction of the full 12,972 — fewer entropy computations per turn.
 
 ---
 
@@ -216,6 +235,8 @@ Spec §10 targets: avg < 3.50, max ≤ 6, 100% win rate. The integration test ac
 
 **Is** — a daily-play assistant. CLI alongside the NYT Wordle app on your phone. Suggests guesses, accepts emoji feedback, prints a Discord-ready share block.
 
-**Isn't** — a Chrome extension that reads the NYT board automatically (spec §13.3, deliberately out of scope), a hard-mode solver (spec §12), an LLM-driven solver (spec §1, empirically worse than entropy), or a DP-optimal solver (spec §1, 0.01 better at days-of-compute cost).
+**Isn't** — a Chrome extension that reads the NYT board automatically (spec §13.3, deliberately out of scope), an LLM-driven solver (spec §1, empirically worse than entropy), or a DP-optimal solver (spec §1, 0.01 better at days-of-compute cost).
+
+Hard mode was originally excluded by spec §12 ("no gameplay benefit") but we've since added it as an opt-in `--hard` flag since you may play that way with friends. Numbers in the Strategy section above.
 
 See spec §12 for the full out-of-scope list.

@@ -1,5 +1,6 @@
 // Candidate filter — see spec §7.
 
+import type { PatternCache } from './patternCache.js';
 import type { GameState } from './state.js';
 
 /** True if `word` is consistent with every constraint accumulated in state. */
@@ -31,4 +32,19 @@ export function isCandidate(word: string, state: GameState): boolean {
   }
 
   return true;
+}
+
+/**
+ * The set of guesses a scorer is allowed to consider this turn.
+ *   - Normal mode: the full guess pool (all 12,972).
+ *   - Hard Mode: guesses that satisfy every known constraint.
+ * Returned as a readonly array; scorers iterate this directly.
+ */
+export function guessPool(state: GameState, cache: PatternCache): readonly string[] {
+  if (!state.hardMode) return cache.guesses;
+  const out: string[] = [];
+  for (const g of cache.guesses) {
+    if (isCandidate(g, state)) out.push(g);
+  }
+  return out;
 }

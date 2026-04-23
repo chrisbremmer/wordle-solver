@@ -10,6 +10,7 @@
 // two Os) and within each candidate (a candidate with one O contributes 1 to
 // the O bucket whether the candidate has 1 or 3 Os).
 
+import { guessPool } from './filter.js';
 import type { PatternCache } from './patternCache.js';
 import { pickBestGuess } from './scorer.js';
 import type { GameState } from './state.js';
@@ -49,12 +50,13 @@ export function pickBestGuessFrequency(state: GameState, cache: PatternCache): s
     }
   }
 
+  const pool = guessPool(state, cache);
   const candSet = new Set(remaining);
-  let bestGuess = cache.guesses[0]!;
+  let bestGuess = pool[0]!;
   let bestScore = -1;
   let bestIsCand = candSet.has(bestGuess);
 
-  for (const guess of cache.guesses) {
+  for (const guess of pool) {
     const s = scoreGuess(guess, counts);
     const isCand = candSet.has(guess);
     if (s > bestScore || (s === bestScore && isCand && !bestIsCand)) {
