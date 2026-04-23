@@ -3,3 +3,4 @@
 import { playInteractive } from './cli.js';
 
 await playInteractive();
+process.exit(0);

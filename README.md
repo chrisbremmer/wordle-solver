@@ -13,7 +13,34 @@ npm run build-cache   # builds ~34MB pattern cache to cache.bin (~20s, one-time)
 npm run play          # interactive CLI: enter feedback after each guess
 npm run benchmark     # plays all 2,315 answers, prints distribution
 npm run analyze       # asks Claude to spot strategic patterns in logs/
+npm run league        # entropy / oneply / frequency / minimax head-to-head
 ```
+
+## Daily play (laptop next to phone)
+
+`npm run play` is built for the "play Wordle on your phone, get help from this CLI"
+workflow. The solver suggests a guess, you type it into the NYT app, then paste the
+emoji row from the result back into the prompt. Three input forms work:
+
+```
+Turn 1: play "SALET" → 🟩🟨⬛⬛🟩       # paste from the Wordle share modal
+Turn 1: play "SALET" → gy..g           # or letters
+Turn 1: play "SALET" → 21002           # or digits
+```
+
+After each game you get a Discord-ready share block:
+
+```
+Wordle solver 4/6
+
+⬛🟨⬛⬛⬛
+⬛🟨🟩⬛⬛
+⬛🟩🟩🟩🟩
+🟩🟩🟩🟩🟩
+```
+
+Prompts "Play another? (y/N)" so you can run a backlog of past Wordles
+without restarting.
 
 ## Post-game analysis with Claude (spec §13.2)
 

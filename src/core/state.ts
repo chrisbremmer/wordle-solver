@@ -8,15 +8,33 @@
  * Normalize a 5-char feedback string into G/Y/. form. Accepts:
  *   "gy..g" | "GY..G"   (letters)
  *   "21002"             (digits: 2=green, 1=yellow, 0=grey)
- *   mixed forms         (e.g. "gy0.g")
+ *   "🟩🟨⬛⬛🟩"           (Wordle share emoji: 🟩 green, 🟨 yellow, ⬛/⬜ grey)
+ *   mixed forms         (e.g. "gy0.🟩")
+ *
+ * Whitespace is stripped (so pasting a trimmed emoji row works).
  */
 export function normalizeFeedback(input: string): string {
-  if (input.length !== 5) {
-    throw new Error(`feedback must be 5 chars, got "${input}" (${input.length})`);
+  // Iterate by codepoint so emoji map cleanly. A single emoji like 🟩 is
+  // one codepoint but two UTF-16 code units, so naive .length / [i] fail.
+  const codepoints = [...input.replace(/\s+/g, '')];
+  const mapped = codepoints
+    .map((ch) =>
+      ch === '🟩'
+        ? 'G'
+        : ch === '🟨'
+          ? 'Y'
+          : ch === '⬛' || ch === '⬜'
+            ? '.'
+            : ch,
+    )
+    .join('');
+
+  if (mapped.length !== 5) {
+    throw new Error(`feedback must be 5 chars, got "${input}" (${mapped.length})`);
   }
   let out = '';
   for (let i = 0; i < 5; i++) {
-    const ch = input[i]!.toLowerCase();
+    const ch = mapped[i]!.toLowerCase();
     if (ch === 'g' || ch === '2') out += 'G';
     else if (ch === 'y' || ch === '1') out += 'Y';
     else if (ch === '.' || ch === '0' || ch === '-') out += '.';

@@ -22,6 +22,16 @@ describe('normalizeFeedback', () => {
     expect(normalizeFeedback('g1.0G')).toBe('GY..G');
   });
 
+  it('accepts Wordle share emoji', () => {
+    expect(normalizeFeedback('🟩🟨⬛⬛🟩')).toBe('GY..G');
+    expect(normalizeFeedback('🟩🟨⬜⬜🟩')).toBe('GY..G'); // light-mode greys
+  });
+
+  it('strips whitespace before validating length', () => {
+    expect(normalizeFeedback(' 🟩🟨⬛⬛🟩 ')).toBe('GY..G');
+    expect(normalizeFeedback('gy . . g')).toBe('GY..G');
+  });
+
   it('rejects wrong length', () => {
     expect(() => normalizeFeedback('gygy')).toThrow();
   });
