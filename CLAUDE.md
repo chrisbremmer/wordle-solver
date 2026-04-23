@@ -15,23 +15,29 @@ Entropy-based Wordle solver in TypeScript. Targets ~3.43 avg guesses, 100% win r
 
 ```
 src/
-  data/         answers.ts (2,309), guesses.ts (~14,855) — static word lists
+  data/         answers.ts (2,315), guesses.ts (12,972) — static word lists
   core/
-    feedback.ts      ★ getPattern(guess, answer) — duplicate-letter rules
-    patternCache.ts  precomputed (guess, answer) → pattern, ~34MB Uint8Array
-    state.ts         GameState (greens, yellows, min/maxCounts, candidates)
-    filter.ts        isCandidate(word, state)
-    scorer.ts        entropyForGuess + pickBestGuess (SALET opener hardcoded)
-  controller.ts      GameController.play(getFeedback)
-  cli.ts             interactive readline loop
+    feedback.ts        ★ getPattern(guess, answer) — duplicate-letter rules
+    patternCache.ts    precomputed (guess, answer) → pattern, ~29MB Uint8Array
+    state.ts           GameState + normalizeFeedback (G/Y/. + emoji + digits)
+    filter.ts          isCandidate(word, state)
+    scorer.ts          entropy + pickBestGuess (SALET hardcoded)
+    oneplyScorer.ts    expected-guesses lookahead
+    frequencyScorer.ts letter-frequency baseline (AROSE opener)
+    minimaxScorer.ts   worst-case-bucket baseline (SERAI opener)
+  controller.ts        GameController.play(getFeedback)
+  cli.ts               readline loop with emoji input + share block + replay
+  cacheLoader.ts       load-or-build cache.bin
+  log.ts               GameLog persistence (logs/<ts>-<answer>.json)
+  share.ts             Wordle-style share block formatter
+  index.ts             entry point (npm run play)
   scripts/
-    buildCache.ts    persists cache.bin (one-off, ~20s)
-    benchmark.ts     plays all 2,309 answers, prints distribution
-test/
-  feedback.test.ts   ★ duplicate-letter cases — implement first
-  filter.test.ts
-  scorer.test.ts
-  integration.test.ts
+    buildCache.ts      npm run build-cache
+    benchmark.ts       npm run benchmark
+    benchmarkLib.ts    reusable engine (also called from integration test)
+    league.ts          npm run league (4 scorers head-to-head)
+    analyze.ts         npm run analyze (Claude API; needs ANTHROPIC_API_KEY)
+test/                  68 unit tests + 1 full-set integration (~95s)
 ```
 
 ## ★ Critical: feedback.ts is the #1 bug source
@@ -56,7 +62,7 @@ npm run test:feedback  # just the dup-letter cases
 npm run build-cache    # writes cache.bin (~34MB, ~20s, one-time)
 npm run play           # interactive CLI (writes logs/<ts>-<answer>.json)
 npm run benchmark      # plays all 2,315; expects avg < 3.50
-                       #   --scorer entropy|oneply
+                       #   --scorer entropy|oneply|frequency|minimax
                        #   --sample N
                        #   --log     write logs/ for every game
                        #   --quiet
