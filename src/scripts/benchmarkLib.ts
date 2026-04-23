@@ -5,6 +5,7 @@ import { GameController } from '../controller.js';
 import { getPattern } from '../core/feedback.js';
 import type { PatternCache } from '../core/patternCache.js';
 import type { ScorerStrategy } from '../core/scorer.js';
+import { writeLog } from '../log.js';
 
 export interface BenchmarkReport {
   total: number;
@@ -19,6 +20,10 @@ export interface BenchmarkReport {
 export interface RunOptions {
   onProgress?: (done: number, total: number) => void;
   scorer?: ScorerStrategy;
+  /** Persist one game log per game under logs/ for the analyze script. */
+  logGames?: boolean;
+  /** Used in the persisted log; defaults to 'entropy'. */
+  scorerName?: string;
 }
 
 function patternToFeedback(p: number): string {
@@ -57,6 +62,18 @@ export async function runBenchmark(
     } else {
       dist.FAIL!++;
       hard.push({ answer, guesses: 0 });
+    }
+    if (opts.logGames) {
+      writeLog({
+        version: 1,
+        timestamp: new Date().toISOString(),
+        scorer: opts.scorerName ?? 'entropy',
+        source: 'benchmark',
+        outcome: outcome.solved ? 'solved' : 'failed',
+        guesses: outcome.guesses,
+        answer,
+        trace: outcome.trace,
+      });
     }
     opts.onProgress?.(i + 1, answersToPlay.length);
   }

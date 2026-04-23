@@ -54,8 +54,14 @@ npm test               # unit + integration
 npm run typecheck      # tsc --noEmit
 npm run test:feedback  # just the dup-letter cases
 npm run build-cache    # writes cache.bin (~34MB, ~20s, one-time)
-npm run play           # interactive CLI
-npm run benchmark      # plays all 2,309; expects avg < 3.50
+npm run play           # interactive CLI (writes logs/<ts>-<answer>.json)
+npm run benchmark      # plays all 2,315; expects avg < 3.50
+                       #   --scorer entropy|oneply
+                       #   --sample N
+                       #   --log     write logs/ for every game
+                       #   --quiet
+npm run analyze        # send logs/ to Claude for strategic-pattern report
+                       # requires ANTHROPIC_API_KEY; default model is opus-4-7
 ```
 
 Slash commands wrap the same scripts: `/feedback-check`, `/build-cache`, `/play`, `/benchmark`, `/fetch-wordlists`.

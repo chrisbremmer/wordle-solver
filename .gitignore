@@ -9,6 +9,9 @@ dist/
 cache.bin
 *.cache.bin
 
+# game logs (one JSON per game, fed to `npm run analyze`)
+logs/
+
 # test coverage
 coverage/
 .nyc_output/

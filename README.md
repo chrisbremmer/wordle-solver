@@ -11,8 +11,24 @@ npm install
 npm test              # unit + integration tests (must pass before anything else)
 npm run build-cache   # builds ~34MB pattern cache to cache.bin (~20s, one-time)
 npm run play          # interactive CLI: enter feedback after each guess
-npm run benchmark     # plays all 2,309 answers, prints distribution
+npm run benchmark     # plays all 2,315 answers, prints distribution
+npm run analyze       # asks Claude to spot strategic patterns in logs/
 ```
+
+## Post-game analysis with Claude (spec §13.2)
+
+Every interactive game writes a JSON trace to `logs/`. Generate benchmark
+logs with `npm run benchmark -- --sample 20 --log`. Then:
+
+```bash
+export ANTHROPIC_API_KEY="sk-ant-..."
+npm run analyze
+```
+
+The analyze script uses `claude-opus-4-7` by default with adaptive thinking
+and prompt caching on the system block (the engineering spec is the cached
+context, so repeat runs cost ~10% of the first one). Override the model
+with `WORDLE_ANALYZE_MODEL=claude-sonnet-4-6` if you want cheaper runs.
 
 ## Strategy
 

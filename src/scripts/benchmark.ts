@@ -9,6 +9,7 @@ import { runBenchmark } from './benchmarkLib.js';
 
 const args = process.argv.slice(2);
 const quiet = args.includes('--quiet');
+const logGames = args.includes('--log');
 const sampleIdx = args.indexOf('--sample');
 const sampleN = sampleIdx >= 0 ? Number(args[sampleIdx + 1]) : 0;
 const scorerIdx = args.indexOf('--scorer');
@@ -34,6 +35,8 @@ if (sampleN > 0) {
 const t0 = Date.now();
 const report = await runBenchmark(cache, answers, ANSWERS, {
   scorer,
+  logGames,
+  scorerName,
   onProgress: quiet ? undefined : (done, total) => {
     if (done % 50 === 0 || done === total) {
       process.stderr.write(`\r  ${done}/${total}`);

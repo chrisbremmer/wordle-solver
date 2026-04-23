@@ -10,6 +10,7 @@ import { stdin, stdout } from 'node:process';
 import { loadOrBuildCache } from './cacheLoader.js';
 import { GameController } from './controller.js';
 import { ANSWERS } from './data/answers.js';
+import { writeLog } from './log.js';
 
 export async function playInteractive(): Promise<void> {
   const { cache, source, ms } = loadOrBuildCache();
@@ -35,6 +36,21 @@ export async function playInteractive(): Promise<void> {
     for (const t of outcome.trace) {
       console.log(`  ${t.turn}. ${t.guess.toUpperCase()}  ${t.feedback}  (${t.candidatesAfter} left)`);
     }
+
+    // Persist a log so the analyze script has material to chew on.
+    const last = outcome.trace.at(-1);
+    const answer = outcome.solved && last ? last.guess : undefined;
+    const logPath = writeLog({
+      version: 1,
+      timestamp: new Date().toISOString(),
+      scorer: 'entropy',
+      source: 'interactive',
+      outcome: outcome.solved ? 'solved' : 'failed',
+      guesses: outcome.guesses,
+      answer,
+      trace: outcome.trace,
+    });
+    console.error(`log: ${logPath}`);
   } finally {
     rl.close();
   }
