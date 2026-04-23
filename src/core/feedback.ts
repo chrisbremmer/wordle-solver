@@ -20,11 +20,33 @@ export const NUM_PATTERNS = 243;
 export const ALL_GREEN: Pattern = 2 + 2 * 3 + 2 * 9 + 2 * 27 + 2 * 81;
 
 /**
- * TODO(spec §5): two-pass implementation.
- *   Pass 1: mark greens, mark answer slots as consumed.
- *   Pass 2: mark yellows against unconsumed answer slots only.
- * Returns base-3 encoded pattern (0..242).
+ * Two-pass scoring per spec §5: greens first (consuming answer slots),
+ * then yellows against unconsumed slots. Returns the base-3 pattern.
+ *
+ * Both inputs must be 5 lowercase ASCII letters.
  */
-export function getPattern(_guess: string, _answer: string): Pattern {
-  throw new Error('getPattern: not implemented (spec §5)');
+export function getPattern(guess: string, answer: string): Pattern {
+  // 0 = grey, 1 = yellow, 2 = green
+  const r = [0, 0, 0, 0, 0];
+  const used = [false, false, false, false, false];
+
+  for (let i = 0; i < 5; i++) {
+    if (guess[i] === answer[i]) {
+      r[i] = 2;
+      used[i] = true;
+    }
+  }
+
+  for (let i = 0; i < 5; i++) {
+    if (r[i] === 2) continue;
+    for (let j = 0; j < 5; j++) {
+      if (!used[j] && guess[i] === answer[j]) {
+        r[i] = 1;
+        used[j] = true;
+        break;
+      }
+    }
+  }
+
+  return r[0]! + r[1]! * 3 + r[2]! * 9 + r[3]! * 27 + r[4]! * 81;
 }
